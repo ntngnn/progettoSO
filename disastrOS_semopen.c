@@ -8,4 +8,10 @@
 
 void internal_semOpen(){
   // do stuff :)
+
+
+     int id=running->syscall_args[0];
+
+     if(SemaphoreList_byId(&semaphores_list , id){
+
 }
