@@ -27,3 +27,6 @@ extern ucontext_t main_context;
 
 // this is used for shutting down (set it to 1, and return the control to main)
 extern int shutdown_now;
+
+//definiamo la lista dei semafori come variabile globale (utilizzabilii da tutti i processi)
+extern ListHead SemaphoreList;

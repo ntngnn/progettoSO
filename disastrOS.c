@@ -184,7 +184,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
 
   // fill these with the syscall handlers
   syscall_vector[DSOS_CALL_SEMOPEN]      = internal_semOpen;
-  syscall_numarg[DSOS_CALL_SEMOPEN]      = 2;
+  syscall_numarg[DSOS_CALL_SEMOPEN]      = 2; //(id , count del semaforo)
 
   syscall_vector[DSOS_CALL_SEMCLOSE]      = internal_semClose;
   syscall_numarg[DSOS_CALL_SEMCLOSE]      = 1;
@@ -287,7 +287,7 @@ void disastrOS_sleep(int sleep_time) {
   disastrOS_syscall(DSOS_CALL_SLEEP, sleep_time);
 }
 
-int disastrOS_semopen(int id,int count){
+int disastrOS_semOpen(int id,int count){
     disastrOS_syscall(DSOS_CALL_SEMOPEN,id,count);
 }
 

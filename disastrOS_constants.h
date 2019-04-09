@@ -28,8 +28,9 @@
 #define DSOS_ERESOURCENOFD -11
 #define DSOS_ERESOURCECLOSE -12
 #define DSOS_ERESOURCEINUSE -13
-#define DSOS_EIDNEG -14
 
+#define DSOS_EIDNEG -14 //id semaforo negativo
+#define DSOS_EXISTINGID -15 //semaforo gia esitente nella lista
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32
 #define DSOS_MAX_SYSCALLS_ARGS 8
