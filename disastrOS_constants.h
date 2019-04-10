@@ -31,6 +31,10 @@
 
 #define DSOS_EIDNEG -14 //id semaforo negativo
 #define DSOS_EXISTINGID -15 //semaforo gia esitente nella lista
+#define DSOS_ESEM_CREATION -16 //errore nell allocazione del semaforo
+
+
+
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32
 #define DSOS_MAX_SYSCALLS_ARGS 8
