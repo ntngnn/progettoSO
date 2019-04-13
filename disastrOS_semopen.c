@@ -19,7 +19,7 @@ void internal_semOpen(){
          return;
      }
 
-     if(SemaphoreList_byId(&SemaphoreList, id){
+     if(SemaphoreList_byId(&semaphoreList, id){
         running->syscall_retvalue=DSOS_EXISTINGID;
         printf("error: Semaphore Id already exists");
         return;
@@ -39,11 +39,17 @@ void internal_semOpen(){
         return;
     }
 
-    List_insert(&SemaphoreList,NULL,(ListItem*) new_sem);
+    List_insert(&semaphoreList,NULL,(ListItem*) new_sem);
     List_insert(&running->sem_descriptors,NULL,(ListItem*)new_sem_desc);
 
     SemDescriptorPtr_alloc* new_sem_desc_ptr=SemDescriptorPtr_alloc(new_sem_desc);
 
-    List_insert(&new_sem->descriptors ,NULL , (ListItem*)new_sem_desc_ptr);
+    List_insert(&new_sem->descriptors , new_sem->descriptors.last , (ListItem*)new_sem_desc_ptr);
+
+    //ritorniamo il descrittore del semaforo(risore identificate dai descrittori)
+
+    running->syscall_retvalue=running->last_sem_fd-1;
+
+    return;
 
 }

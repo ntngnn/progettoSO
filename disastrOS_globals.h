@@ -29,4 +29,4 @@ extern ucontext_t main_context;
 extern int shutdown_now;
 
 //definiamo la lista dei semafori come variabile globale (utilizzabilii da tutti i processi)
-extern ListHead SemaphoreList;
+extern SemaphoreList semaphoreList;
