@@ -43,3 +43,4 @@ void disastrOS_printStatus();
 //semaphore functions
 
 int disastrOS_semOpen(int id,int count);
+int disastrOS_semClose(int fd);

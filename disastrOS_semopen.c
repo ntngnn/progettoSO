@@ -31,7 +31,7 @@ void internal_semOpen(){
     Semaphore* new_sem=Semaphore_alloc(id , count);
 
     int fd = running->last_sem_fd;
-    SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running);
+    SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running->sem_descriptors);
 
     if(!new_sem || !new_sem_desc){
         printf("errore creazione semaforo");
