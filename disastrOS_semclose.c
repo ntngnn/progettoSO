@@ -25,7 +25,7 @@ void internal_semClose(){
     SemDescriptor* desc= SemDescriptorList_byFd(running->sem_descriptors , fd);
 
     if(!desc){
-        running->syscall_retvalue=DSOS_ESEMAPHORECLOSE;
+        running->syscall_retvalue=DSOS_ESEMAPHOREDESC;
         return;
     }
 

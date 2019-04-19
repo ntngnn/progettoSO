@@ -33,6 +33,7 @@
 #define DSOS_EXISTINGID -15 //semaforo gia esitente nella lista
 #define DSOS_ESEM_CREATION -16 //errore nell allocazione del semaforo
 #define DSOS_ESEMPAHORECLOSE -17 //errore nella chiusura del semaforo
+#define DSOS_ESEMPAHOREDESC -18 //descrittore nono valido
 
 
 
