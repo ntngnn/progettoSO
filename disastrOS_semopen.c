@@ -14,13 +14,13 @@ void internal_semOpen(){
      int id=running->syscall_args[0];
 
      if(id < 0 ){
-         syscall_retvalue=DSOS_EIDNEG;
+         syscall_retvalue=DSOS_SEMOPEN_EIDNEG;
          printf("error:Semaphore id must be positive");
          return;
      }
 
      if(SemaphoreList_byId(&semaphoreList, id){
-        running->syscall_retvalue=DSOS_EXISTINGID;
+        running->syscall_retvalue=DSOS__SEMOPEN_EXISTINGID;
         printf("error: Semaphore Id already exists");
         return;
      }
@@ -35,7 +35,7 @@ void internal_semOpen(){
 
     if(!new_sem || !new_sem_desc){
         printf("errore creazione semaforo");
-        running->syscall_retvalue=DSOS_ESEM_CREATION;
+        running->syscall_retvalue=DSOS_ESEMOPEN_CREATION;
         return;
     }
 

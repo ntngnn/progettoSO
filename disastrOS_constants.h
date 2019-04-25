@@ -29,12 +29,12 @@
 #define DSOS_ERESOURCECLOSE -12
 #define DSOS_ERESOURCEINUSE -13
 
-#define DSOS_EIDNEG -14 //id semaforo negativo
-#define DSOS_EXISTINGID -15 //semaforo gia esitente nella lista
-#define DSOS_ESEM_CREATION -16 //errore nell allocazione del semaforo
+#define DSOS_ESEMOPEN_IDNEG -14 //id semaforo negativo
+#define DSOS_ESEMOPEN_EXISTINGID -15 //semaforo gia esitente nella lista
+#define DSOS_ESEMOPEN_CREATION -16 //errore nell allocazione del semaforo
 #define DSOS_ESEMPAHORECLOSE -17 //errore nella chiusura del semaforo
-#define DSOS_ESEMPAHOREDESC -18 //descrittore nono valido
-
+#define DSOS_ESEMPOST_DESC -18 //descrittore nono valido
+#define DSOS_ESEMWAIT_DESC -19 //descrittore non valido
 
 
 // syscall numbers

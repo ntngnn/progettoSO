@@ -9,27 +9,39 @@
 void internal_semPost(){
   // do stuff :)
 
-
-
     int fd=syscall_args[0];
 
-    SemDescriptor* desc=SemDescriptorList_byFd(&running->sem_descriptors , (ListItem*)fd);
+    SemDescriptor* desc=SemDescriptorList_byFd(&running->sem_descriptors , fd);
 
     if(!desc){
-        running->syscall_retvalue=DSOS_ESEMPAHOREDESC;
+        running->syscall_retvalue=DSOS_ESEMPOST_DESC;
         prinf("descrittore non valido");
 
         return;
     }
 
-    Semaphore sem=desc->semaphore;
+    Semaphore* sem=desc->semaphore;
 
     sem->count++;
 
     if(sem->count <= 0 &&  sem->waiting_descriptors != NULL ){
-        SemDescriptor desc_ready= (SemDescriptor*) List_detach(&sem->waiting_descriptors ,(ListItem*) (sem->waiting_descriptors).first );
 
+        SemDescriptorPtr* desc_ready= (SemDescriptorPtr*) List_detach(&sem->waiting_descriptors ,(ListItem*) (sem->waiting_descriptors).first );
 
+        //pcb corrispondente.
+        PCB* ready=desc_ready->descriptor>pcb;
 
+        //rimozione "pcb selezionato" dalla waiting list ed inserimento nella ready list
+        List_detach(&waiting_list , (ListItem*) ready);
+        List_insert(&ready_list , &ready_list.last , (ListItem*) ready);
+        ready->status=Ready;
 
+        //Cambiamo stato del processo chiamante che viene messo in reaDY
+        running->status=Ready;
+        List_insert(&ready_list ,  &ready_list.last, (ListItem*) running);
+
+    }
+
+    running->syscall_retvalue=0;
+    return;
 }

@@ -1,4 +1,4 @@
-#pragma once
++#pragma once
 #include <ucontext.h> // this is the cpu status
 #include "disastrOS_constants.h"
 #include "linked_list.h"
@@ -12,7 +12,7 @@ typedef enum ProcessStatus {Invalid=-1,
 			    Suspended=0x4, // ctrl-z
 			    Zombie=0x5}
   ProcessStatus;
-		    
+
 typedef struct PCB{
   ListItem list;  // MUST BE THE FIRST!!!
   int pid;
@@ -33,21 +33,21 @@ typedef struct PCB{
   // descriptors for semaphores
   int last_sem_fd;
   ListHead sem_descriptors;
-  
+
   //we are really rude :) the stack is INSIDE the pcb
   //forgive me for the bestiality
   char stack[STACK_SIZE];
 
   // more stuff to come
 
-  
+
   //the one below is a hack for the syscalls
   //in a real system one needs to use the cpu to pass
   //arguments to a syscall
 
   // we use long int so we can store pointers on 64 bit machines
   int syscall_num;
-  long int syscall_args[DSOS_MAX_SYSCALLS_ARGS]; 
+  long int syscall_args[DSOS_MAX_SYSCALLS_ARGS];
   int syscall_retvalue;
 } PCB;
 
