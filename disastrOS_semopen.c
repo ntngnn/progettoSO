@@ -14,13 +14,13 @@ void internal_semOpen(){
      int id=running->syscall_args[0];
 
      if(id < 0 ){
-         syscall_retvalue=DSOS_SEMOPEN_EIDNEG;
+         running->syscall_retvalue=DSOS_ESEMOPEN_IDNEG;
          printf("error:Semaphore id must be positive");
          return;
      }
 
-     if(SemaphoreList_byId(&semaphoreList, id){
-        running->syscall_retvalue=DSOS__SEMOPEN_EXISTINGID;
+     if(SemaphoreList_byId(&semaphoreList, id)){
+        running->syscall_retvalue=DSOS_ESEMOPEN_EXISTINGID;
         printf("error: Semaphore Id already exists");
         return;
      }
@@ -31,7 +31,7 @@ void internal_semOpen(){
     Semaphore* new_sem=Semaphore_alloc(id , count);
 
     int fd = running->last_sem_fd;
-    SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running->sem_descriptors);
+    SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running);
 
     if(!new_sem || !new_sem_desc){
         printf("errore creazione semaforo");
@@ -39,10 +39,10 @@ void internal_semOpen(){
         return;
     }
 
-    List_insert(&semaphoreList,NULL,(ListItem*) new_sem);
-    List_insert(&running->sem_descriptors,NULL,(ListItem*)new_sem_desc);
+    List_insert(&semaphoreList,&semaphoreList.last,(ListItem*) new_sem);
+    List_insert(&running->sem_descriptors,&running->sem_descriptors.last,(ListItem*)new_sem_desc);
 
-    SemDescriptorPtr_alloc* new_sem_desc_ptr=SemDescriptorPtr_alloc(new_sem_desc);
+    SemDescriptorPtr* new_sem_desc_ptr=SemDescriptorPtr_alloc(new_sem_desc);
 
     List_insert(&new_sem->descriptors , new_sem->descriptors.last , (ListItem*)new_sem_desc_ptr);
 

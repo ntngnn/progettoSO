@@ -146,6 +146,8 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
+  Semaphore_init();
+  SemDescriptor_init();
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
@@ -228,7 +230,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   disastrOS_debug("setting entry point for timer interrupt... ");
   interrupt_context=trap_context; // the interrupt and the system live on the same stack
   interrupt_context.uc_link = &main_context;
-  sigemptyset(&interrupt_context.uc_sigmask);+
+  sigemptyset(&interrupt_context.uc_sigmask);
   makecontext(&interrupt_context, timerInterrupt, 0); //< this is a context for the interrupt
 
 
@@ -298,7 +300,7 @@ int disastrOS_semOpen(int id,int count){
 }
 
 int disastrOS_semClose(int fd){
-    return (DSOS_CALL_SEMCLOSE,fd);
+    return disastrOS_syscall(DSOS_CALL_SEMPOST,fd);
 }
 
 int disastros_semPost(int fd){

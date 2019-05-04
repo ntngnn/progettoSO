@@ -15,14 +15,14 @@ void internal_semClose(){
 
     if(sem_to_close < 0 ){
 
-        running->syscall_retvalue=DSOS_EIDNEG;
+        running->syscall_retvalue=DSOS_SEMCLOSE_EIDNEG;
         printf("semaphore fd must be positive");
         return;
     }
 
 
 
-    SemDescriptor* desc= SemDescriptorList_byFd(running->sem_descriptors , fd);
+    SemDescriptor* desc= SemDescriptorList_byFd(&running->sem_descriptors , sem_to_close);
 
     if(!desc){
         running->syscall_retvalue=DSOS_ESEMAPHOREDESC;

@@ -51,7 +51,7 @@ void initFunction(void* args) {
 
     /*  printf("***chiudiamo semaforo***")
 	ret=disastrOS_semClose(nsem);
-      printf("close con ritorno: %d",ret);*/
+      printf("close con ritorno: %d",ret);
 
   /*disastrOS_spawn(sleeperFunction, 0);
 
