@@ -1,8 +1,10 @@
+
+
 #include <assert.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "disastrOS.h"
-
 #include "disastrOS_syscalls.h"
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
@@ -21,7 +23,7 @@ void internal_semOpen(){
 
      if(SemaphoreList_byId(&semaphoreList, id)){
         running->syscall_retvalue=DSOS_ESEMOPEN_EXISTINGID;
-        printf("error: Semaphore Id already exists");
+        printf("error: Semaphore %d already exists" , id);
         return;
      }
 
@@ -39,8 +41,8 @@ void internal_semOpen(){
         return;
     }
 
-    List_insert(&semaphoreList,&semaphoreList.last,(ListItem*) new_sem);
-    List_insert(&running->sem_descriptors,&running->sem_descriptors.last,(ListItem*)new_sem_desc);
+    List_insert(&semaphoreList,semaphoreList.last,(ListItem*) new_sem);
+    List_insert(&running->sem_descriptors,(running->sem_descriptors).last,(ListItem*)new_sem_desc);
 
     SemDescriptorPtr* new_sem_desc_ptr=SemDescriptorPtr_alloc(new_sem_desc);
 
@@ -48,7 +50,7 @@ void internal_semOpen(){
 
     //ritorniamo il descrittore del semaforo(risore identificate dai descrittori)
 
-    running->syscall_retvalue=running->last_sem_fd-1;
+    running->syscall_retvalue=new_sem_desc->fd;
 
     return;
 

@@ -37,6 +37,7 @@
 #define DSOS_ESEMPOST_DESC -18 //descrittore nono valido
 #define DSOS_ESEMWAIT_DESC -19 //descrittore non valido
 #define DSOS_ESEMCLOSE_IDNEG -20 //descrittore nnegativo non valido
+#define DSOS_ESEMCLOSE_DESC -21  //descrittore non trovato
 
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32

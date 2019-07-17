@@ -31,6 +31,19 @@ void childFunction(void* args){
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
+void child_test(void *args){
+
+    printf("testing");
+    /*int fd=*((int*)args);
+	for (int j=0 ; j < 5 ; j++){
+
+        disastrOS_semWait(fd);
+         printf("figlio in sezione critica");
+        disastrOS_semPost(fd);
+    }*/
+    printf("figlio termina");
+}
+
 
 void initFunction(void* args) {
   disastrOS_printStatus();
@@ -39,24 +52,51 @@ void initFunction(void* args) {
   //testing semopen and semclose
 
     //apriamo il semaforo 16
-    printf("open semaforo16");
+    printf("/n open semaforo16 /n");
     int nsem=16;
-    int ret;
+    int ret,pid;
+    int retval;
 
     ret=disastrOS_semOpen(nsem,0);
 
+
+
+    printf("open con ritorno(fd) : %d /n" , ret);
     disastrOS_printStatus();
 
-    printf("open con ritorno(fd) : %d" , ret);
+    disastrOS_spawn(child_test , 0 );
 
-    /*  printf("***chiudiamo semaforo***")
+    for (int i ; i < 5; i++){
+    	disastrOS_semWait(ret);
+
+    	printf("padre in sez critica");
+
+    	disastrOS_semPost(ret);
+    }
+
+    pid=disastrOS_wait(0,&retval);
+    disastrOS_semClose(ret);
+
+
+    /*printf("SSSSSSS/n");
+    //apriamo semaforo 17
+    nsem=17;
+    retval=disastrOS_semOpen(nsem,17);
+    printf(" ritorno %d " , retval );
+    disastrOS_printStatus();
+
+    printf("chiusura di 16");
+    retval=disastrOS_semClose(ret);
+    printf("chiusura con ritorno %d" , retval);
+    disastrOS_printStatus();
+    printf("chiudiamo semaforo***")
 	ret=disastrOS_semClose(nsem);
-      printf("close con ritorno: %d",ret);*/
+      printf("close con ritorno: %",ret);
 
-  /*disastrOS_spawn(sleeperFunction, 0);
+   disastrOS_spawn(sleeperFunction, 0);
 
 
-  printf("I feel like to spawn 10 nice threads\n");
+  printf("I feel like to spawn 1 nice threads\n");
   int alive_children=0;
   for (int i=0; i<10; ++i) {
     int type=0;
@@ -70,7 +110,7 @@ void initFunction(void* args) {
   }
 
   disastrOS_printStatus();
-  /*int retval;
+  int retval;
   int pid;
   while(alive_children>0 && (pid=disastrOS_wait(0, &retval))>=0){
     disastrOS_printStatus();
@@ -96,3 +136,4 @@ int main(int argc, char** argv){
   disastrOS_start(initFunction, 0, logfilename);
   return 0;
 }
+

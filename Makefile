@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall 
+CCOPTS=--std=gnu99 -Wall
 AR=ar
 
 HEADERS=disastrOS.h\
@@ -14,6 +14,7 @@ HEADERS=disastrOS.h\
 	disastrOS_semdescriptor.h\
 	linked_list.h\
 	pool_allocator.h\
+
 
 OBJS=pool_allocator.o\
      linked_list.o\
@@ -38,7 +39,7 @@ OBJS=pool_allocator.o\
      disastrOS_semopen.o\
      disastrOS_semclose.o\
      disastrOS_semwait.o\
-     disastrOS_sempost.o
+     disastrOS_sempost.o\
 
 
 LIBS=libdisastrOS.a
@@ -55,7 +56,7 @@ all:	$(LIBS) $(BINS)
 %.o:	%.c $(HEADERS)
 	$(CC) $(CCOPTS) -c -o $@  $<
 
-libdisastrOS.a: $(OBJS) $(HEADERS) 
+libdisastrOS.a: $(OBJS) $(HEADERS)
 	$(AR) -rcs $@ $^
 	$(RM) $(OBJS)
 

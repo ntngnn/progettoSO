@@ -17,7 +17,7 @@ void internal_semWait(){
         running->syscall_retvalue=DSOS_ESEMWAIT_DESC;
         printf("id semaforo non valido");
         return;
-
+    }
     Semaphore* sem=desc->semaphore;
 
     sem->count -= 1;
@@ -35,7 +35,7 @@ void internal_semWait(){
             List_insert(&waiting_list , waiting_list.last , (ListItem*) running);
 
             // primo processo in ready --> running
-            if(ready_list != NULL){
+            if(ready_list.first){
 
                 running=(PCB*) List_detach(&ready_list , (ListItem*) ready_list.first);
 

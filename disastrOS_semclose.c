@@ -15,7 +15,7 @@ void internal_semClose(){
 
     if(sem_to_close < 0 ){
 
-        running->syscall_retvalue=DSOS_SEMCLOSE_EIDNEG;
+        running->syscall_retvalue=DSOS_ESEMCLOSE_IDNEG;
         printf("semaphore fd must be positive");
         return;
     }
@@ -25,11 +25,11 @@ void internal_semClose(){
     SemDescriptor* desc= SemDescriptorList_byFd(&running->sem_descriptors , sem_to_close);
 
     if(!desc){
-        running->syscall_retvalue=DSOS_ESEMAPHOREDESC;
+        running->syscall_retvalue=DSOS_ESEMCLOSE_DESC;
         return;
     }
 
-    Semaphore sem=desc->semaphore;
+    Semaphore* sem=desc->semaphore;
 
     SemDescriptorPtr* ptr=(SemDescriptorPtr*) List_detach(&sem->descriptors,(ListItem*)desc->ptr);
 
@@ -38,11 +38,11 @@ void internal_semClose(){
         return;
     }
 
-    List_detach(&running->sem_descriptors,(ListItem*)sem_desc);
+    List_detach(&running->sem_descriptors,(ListItem*)desc);
 
 
     if(sem->waiting_descriptors.size==0){
-        List_detach(&semaphorelist,(ListItem*) sem);
+        List_detach(&semaphoreList,(ListItem*) sem);
         Semaphore_free(sem);
         printf("semaforo deallocato");
     }
