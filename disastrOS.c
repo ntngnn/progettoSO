@@ -301,7 +301,7 @@ int disastrOS_semOpen(int id,int count){
 }
 
 int disastrOS_semClose(int fd){
-    return disastrOS_syscall(DSOS_CALL_SEMPOST,fd);
+    return disastrOS_syscall(DSOS_CALL_CLOSE,fd);
 }
 
 int disastrOS_semPost(int fd){

@@ -26,7 +26,7 @@ void internal_semPost(){
 
     if(sem->count <= 0 &&  sem->waiting_descriptors.first != NULL ){
 
-	//preleviamo il descrittore legato al primo processo dalla waiting list
+	//preleviamo ildescrittore legato al primo processo dalla waiting list
         SemDescriptorPtr* desc_ready= (SemDescriptorPtr*) List_detach(&(sem->waiting_descriptors) ,(ListItem*) (sem->waiting_descriptors).first );
 
         //pcb corrispondente.
@@ -44,5 +44,5 @@ void internal_semPost(){
     }
 
     running->syscall_retvalue=0;
-    
+    return;
 }

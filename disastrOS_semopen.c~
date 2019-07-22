@@ -14,7 +14,6 @@ void internal_semOpen(){
 
 
      int id=running->syscall_args[0];
-     int count=running->syscall_args[1];
 
      if(id < 0 ){
          running->syscall_retvalue=DSOS_ESEMOPEN_IDNEG;
@@ -22,27 +21,26 @@ void internal_semOpen(){
          return;
      }
 
-
-    // verifica semaforo preesistente e creazione semaforo in caso negativo
-     Semaphore* new_sem=SemaphoreList_byId(&semaphoreList, id);
-     if(!new_sem){
-        new_sem=Semaphore_alloc(id , count);
-        if(!new_sem){
-            printf("errore creazione semaforo");
-            running->syscall_retvalue=DSOS_ESEMOPEN_CREATION;
-            return;
-
-        }
-        //inserimento del nuovo semaforo nella lista
-        List_insert(&semaphoreList,semaphoreList.last,(ListItem*) new_sem);
+     if(SemaphoreList_byId(&semaphoreList, id)){
+        running->syscall_retvalue=DSOS_ESEMOPEN_EXISTINGID;
+        printf("error: Semaphore %d already exists" , id);
+        return;
      }
 
+    int count=running->syscall_args[1];
+
+   //creazione semaforo e inserimento in lista semafori(allocazione descrittore per tenerne traccia)
+    Semaphore* new_sem=Semaphore_alloc(id , count);
+	
+    if(!new_sem ){
+        printf("errore creazione semaforo");
+        running->syscall_retvalue=DSOS_ESEMOPEN_CREATION;
+        return;
+    }
+
+    List_insert(&semaphoreList,semaphoreList.last,(ListItem*) new_sem);
 
 
-
-
-
-    //creazione descrittore semaforo e assegnazione al pcb del processo running
     int fd = running->last_sem_fd;
     SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running);
 
@@ -52,20 +50,19 @@ void internal_semOpen(){
         return;
     }
 
+    
+    
 
-
-    //puntatore al descrittore
     SemDescriptorPtr* new_sem_desc_ptr=SemDescriptorPtr_alloc(new_sem_desc);
-
+	
     if(!new_sem_desc_ptr){
-        running->syscall_retvalue=DSOS_ESEMOPEN_CREATION;
-        printf("errore nella creazione del semaforo");
-        return;
+	running->syscall_retvalue=DSOS_ESEMOPEN_CREATION;
+	printf("errore nella creazione del semaforo");
+	return;
     }
-
+    
     new_sem_desc->ptr=ptr;
 
-    //inserimento descrittore e puntatore nelle rispettive liste
     List_insert(&(running->sem_descriptors),(running->sem_descriptors).last,(ListItem*)new_sem_desc);
     List_insert(&(new_sem->descriptors ), new_sem->descriptors.last , (ListItem*)new_sem_desc_ptr);
 

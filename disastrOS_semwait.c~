@@ -29,7 +29,7 @@ void internal_semWait(){
             SemDescriptorPtr* waitingptr= desc->ptr;
             List_insert(&(sem->waiting_descriptors) , sem->waiting_descriptors.last , (ListItem*) waitingptr); //descrittore processo nei waiting descriptors
 
-            //SCHEDULING:inseriamo running(processo chiamante) nella coda dei processi in wait
+            //inseriamo running(processo chiamante) nella coda dei processi in wait
 
             running->status=Waiting;
             List_insert(&waiting_list , waiting_list.last , (ListItem*) running);

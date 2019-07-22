@@ -31,18 +31,18 @@ void childFunction(void* args){
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
-void child_test(void *args){
+/*void child_test(void *args){
 
     printf("testing");
-    /*int fd=*((int*)args);
+    int fd=*((int*)args);
 	for (int j=0 ; j < 5 ; j++){
 
         disastrOS_semWait(fd);
          printf("figlio in sezione critica");
         disastrOS_semPost(fd);
-    }*/
+    }
     printf("figlio termina");
-}
+}*/
 
 
 void initFunction(void* args) {
@@ -58,24 +58,26 @@ void initFunction(void* args) {
     int retval;
 
     ret=disastrOS_semOpen(nsem,0);
+    //fd=running->syscall_retvalue;
 
 
 
-    printf("open con ritorno(fd) : %d /n" , ret);
+    printf("open con ritorno(fd) : %d \n " , ret);
     disastrOS_printStatus();
 
-    disastrOS_spawn(child_test , 0 );
+    /*disastrOS_spawn(child_test , &fd);
 
     for (int i ; i < 5; i++){
-    	disastrOS_semWait(ret);
+    	disastrOS_semWait(fd);
 
     	printf("padre in sez critica");
 
-    	disastrOS_semPost(ret);
-    }
+    	disastrOS_semPost(fd);
+    }*/
 
-    pid=disastrOS_wait(0,&retval);
-    disastrOS_semClose(ret);
+    //pid=disastrOS_wait(0,&retval);
+    disastrOS_semClose(16);
+
 
 
     /*printf("SSSSSSS/n");
