@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <poll.h>
+#include "disastrOS_semaphore.h"
 #include "disastrOS.h"
+#include "disastrOS_globals.h"
+
+
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -14,7 +18,7 @@ void sleeperFunction(void* args){
 
 
 
-
+/*
 void childFunction(void* args){
   printf("Hello, I am the child function %d\n",disastrOS_getpid());
   printf("I will iterate a bit, before terminating\n");
@@ -30,73 +34,95 @@ void childFunction(void* args){
   }
   disastrOS_exit(disastrOS_getpid()+1);
 }
+*/
 
-/*void child_test(void *args){
+void child_test(void* args){
 
-    printf("testing");
-    int fd=*((int*)args);
-	for (int j=0 ; j < 5 ; j++){
+    printf("hello , I'M CHILD ,PID: %d \n",running->pid);
 
-        disastrOS_semWait(fd);
-         printf("figlio in sezione critica");
-        disastrOS_semPost(fd);
+
+    int ret = disastrOS_semOpen(16, 1);
+    printf("open child return value(fd) = %d \n",ret);
+
+    printf("Semaphore list : \n");
+    SemaphoreList_print(&semaphoreList);
+
+    for (int j=0 ; j < 5 ; j++){
+
+        	disastrOS_semWait(ret);
+         	printf("son in critical section \n");
+        	disastrOS_semPost(ret);
     }
-    printf("figlio termina");
-}*/
+    disastrOS_semClose(ret);
+
+
+    printf("figlio termina\n");
+    disastrOS_exit(disastrOS_getpid()+1);
+}
+
+void dad_test(void* args){
+
+
+    printf("HELLO I'M DEAD ,PID: %d \n",running->pid);
+
+
+    int ret;
+
+
+    ret=disastrOS_semOpen(16,1);   //opening  semaphore 16
+
+    printf("open dead return value (fd) = %d \n " , ret);
+
+
+    printf("Semaphore list : \n");
+    SemaphoreList_print(&semaphoreList);
+
+
+
+    for (int i=0 ; i < 5; i++){
+
+        disastrOS_semWait(ret);
+
+    	printf(" dad in critical section \n");
+
+    	disastrOS_semPost(ret);
+    }
+    disastrOS_semClose(ret);
+
+
+    disastrOS_exit(disastrOS_getpid()+1);
+
+}
+
+
 
 
 void initFunction(void* args) {
-  disastrOS_printStatus();
-  printf("hello, I am init and I just started\n");
-
-  //testing semopen and semclose
-
-    //apriamo il semaforo 16
-    printf("/n open semaforo16 /n");
-    int nsem=16;
-    int ret,pid;
-    int retval;
-
-    ret=disastrOS_semOpen(nsem,0);
-    //fd=running->syscall_retvalue;
 
 
-
-    printf("open con ritorno(fd) : %d \n " , ret);
-    disastrOS_printStatus();
-
-    /*disastrOS_spawn(child_test , &fd);
-
-    for (int i ; i < 5; i++){
-    	disastrOS_semWait(fd);
-
-    	printf("padre in sez critica");
-
-    	disastrOS_semPost(fd);
-    }*/
-
-    //pid=disastrOS_wait(0,&retval);
-    disastrOS_semClose(16);
+    printf("hello, I am init and I just started\n");
+    printf("we are testing the problem with 1 dad and  1 son , that 'access' in critical section alternativaly .");
 
 
+    //"testing with 1 producer 1 consumer"
 
-    /*printf("SSSSSSS/n");
-    //apriamo semaforo 17
-    nsem=17;
-    retval=disastrOS_semOpen(nsem,17);
-    printf(" ritorno %d " , retval );
-    disastrOS_printStatus();
+    printf("inserire numero  semaforo \n");
+    //scanf("%d",&nsem);
 
-    printf("chiusura di 16");
-    retval=disastrOS_semClose(ret);
-    printf("chiusura con ritorno %d" , retval);
-    disastrOS_printStatus();
-    printf("chiudiamo semaforo***")
-	ret=disastrOS_semClose(nsem);
-      printf("close con ritorno: %",ret);
 
-   disastrOS_spawn(sleeperFunction, 0);
+    disastrOS_spawn(dad_test,0);
+    disastrOS_spawn(child_test,0);
+    disastrOS_wait(0,NULL);
+    disastrOS_wait(0,NULL);
 
+
+    printf("Lista semafori :");
+    SemaphoreList_print(&semaphoreList);
+
+    printf("shutdown!");
+    disastrOS_shutdown();
+
+/*
 
   printf("I feel like to spawn 1 nice threads\n");
   int alive_children=0;
@@ -120,8 +146,7 @@ void initFunction(void* args) {
 	   pid, retval, alive_children);
     --alive_children;
   }*/
-  printf("shutdown!");
-  disastrOS_shutdown();
+
 }
 
 int main(int argc, char** argv){
@@ -132,7 +157,7 @@ int main(int argc, char** argv){
   // we create the init process processes
   // the first is in the running variable
   // the others are in the ready queue
-  printf("the function pointer is: %p", childFunction);
+ // printf("the function pointer is: %p", childFunction);
   // spawn an init process
   printf("start\n");
   disastrOS_start(initFunction, 0, logfilename);

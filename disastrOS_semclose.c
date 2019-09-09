@@ -67,10 +67,8 @@ void internal_semClose(){
 
     }
 
-    printf("semaforo deallocato");
+
     running->syscall_retvalue=0;
-
-
 
 
 

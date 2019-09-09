@@ -20,11 +20,11 @@ void internal_semWait(){
     }
     Semaphore* sem=desc->semaphore;
 
+
+
     sem->count -= 1;
 
-
-
-    if(sem->count <= 0){
+    if(sem->count <=0){
 
             SemDescriptorPtr* waitingptr= desc->ptr;
             List_insert(&(sem->waiting_descriptors) , sem->waiting_descriptors.last , (ListItem*) waitingptr); //descrittore processo nei waiting descriptors
@@ -41,9 +41,12 @@ void internal_semWait(){
 
             }else{
                 printf("no process ready");
+
             }
 
+
     }
+
     running->syscall_retvalue=0;
     return;
 }

@@ -43,8 +43,8 @@ void internal_semOpen(){
 
 
     //creazione descrittore semaforo e assegnazione al pcb del processo running
-    int fd = running->last_sem_fd;
-    SemDescriptor* new_sem_desc=SemDescriptor_alloc(fd++, new_sem , running);
+    running->last_sem_fd+=1;
+    SemDescriptor* new_sem_desc=SemDescriptor_alloc(running->last_sem_fd, new_sem , running);
 
     if(!new_sem_desc){
         printf("errore creazione semaforo");
@@ -63,7 +63,7 @@ void internal_semOpen(){
         return;
     }
 
-    new_sem_desc->ptr=ptr;
+    new_sem_desc->ptr=new_sem_desc_ptr;
 
     //inserimento descrittore e puntatore nelle rispettive liste
     List_insert(&(running->sem_descriptors),(running->sem_descriptors).last,(ListItem*)new_sem_desc);
