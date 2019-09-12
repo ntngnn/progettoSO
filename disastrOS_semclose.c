@@ -11,23 +11,14 @@ void internal_semClose(){
 
     int ret;
 
-  //fd semaforo da chiudere passato come argomento
-
-   int sem_to_close = running->syscall_args[0];
 
 
-
-    if(sem_to_close < 0 ){
-
-        running->syscall_retvalue=DSOS_ESEMCLOSE_IDNEG;
-        printf("semaphore fd must be positive");
-        return;
-    }
+   int sem_to_close = running->syscall_args[0];  //semaphore fd
 
 
-    //'recuperiamo' il descrittore del semaforo
     SemDescriptor* desc= SemDescriptorList_byFd(&running->sem_descriptors , sem_to_close);
 
+    //check if process keep track of the semaphore descriptor(=has opened the semaphore).
     if(!desc){
         running->syscall_retvalue=DSOS_ESEMCLOSE_DESC;
         return;
@@ -36,31 +27,34 @@ void internal_semClose(){
     Semaphore* sem=desc->semaphore;
     SemDescriptorPtr* ptr=desc->ptr;
 
-    desc=List_detach(&(running->sem_descriptors),(ListItem*)desc);
-    ret= SemDescriptor_free(desc);
-    //verifica operazione riuscita(ret=0)
+    desc=(SemDescriptor*)List_detach(&(running->sem_descriptors),(ListItem*)desc);  //drop descriptor by running  descriptor list
+    ret= SemDescriptor_free(desc);                                  //  descriptor free
+
     if(ret){
         running->syscall_retvalue=ret;
+        printf("semclose error (free) ");
         return;
     }
 
-    ptr=(SemDescriptorPtr*) List_detach(&(sem->descriptors),(ListItem*)desc->ptr);
-    ret= SemDescriptorPtr_free(ptr);
-    //verifica operazione riuscita(ret=0)
+    ptr=(SemDescriptorPtr*) List_detach(&(sem->descriptors),(ListItem*)desc->ptr);    //drop descriptor ptr from SemDescriptorPtr's list
+    ret= SemDescriptorPtr_free(ptr);                                                  //descriptor free
+
     if(ret){
         running->syscall_retvalue=ret;
+        printf("semclose error (free) ");
         return;
     }
 
 
 
-
+    //if no other descriptorptr in the list , we can unlink the semaphore.
     if((sem->descriptors).size==0){
-        sem=List_detach(&semaphoreList,(ListItem*) sem);
+        sem=(Semaphore*)List_detach(&semaphoreList,(ListItem*) sem);
         ret=Semaphore_free(sem);
-        //verifica operazione riuscita(ret=0)
+
         if(ret){
             running->syscall_retvalue=ret;
+            printf("semclose error (free)");
             return;
         }
 

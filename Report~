@@ -1,0 +1,27 @@
+
+
+
+
+
+-WHAT?
+ 
+ Implementation of disastrOS semaphores.
+
+-HOW?
+ 
+ semopen: if semaphore has not already been created , we allocate a new semaphore (with its descriptors) and we return the semaphore descriptor .
+          Else we return descriptor of existing semaphore.
+
+ semclose: we close semaphore and its descriptors ,then free the "space" allocated by semopen.
+
+ semwait: calling process decreases semaphore count , if count <=0 process will be scheduled in waiting list.
+	  Else caliing process acces in critical section . 
+	  job done ->return 0 .
+
+ sempost : calling process increases semaphore count , if count <= 0 fisrt process in waiting list placed in ready list.
+	   job done ->return 0 .
+
+
+-HOW RUN? 
+        
+        ./disastrOS_test by shell

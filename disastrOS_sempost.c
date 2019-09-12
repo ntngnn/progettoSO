@@ -13,6 +13,7 @@ void internal_semPost(){
 
     SemDescriptor* desc=SemDescriptorList_byFd(&(running->sem_descriptors ), fd);
 
+    //check if process keep track of the semaphore descriptor(=has opened the semaphore)
     if(!desc){
         running->syscall_retvalue=DSOS_ESEMPOST_DESC;
         printf("descrittore non valido");
@@ -26,16 +27,21 @@ void internal_semPost(){
 
     if(sem->count <= 0 &&  sem->waiting_descriptors.first != NULL ){
 
-	//preleviamo il descrittore legato al primo processo dalla waiting list
-        SemDescriptorPtr* desc_ready= (SemDescriptorPtr*) List_detach(&(sem->waiting_descriptors) ,(ListItem*) (sem->waiting_descriptors).first );
+        // //SCHEDULNG:
+                   //1)take PCB selected by the waiting list
+                   //2)and place in  the ready list.
 
-        //pcb corrispondente.
-        PCB* ready=desc_ready->descriptor->pcb;
 
-        //SCHEDULNG:rimozione "pcb selezionato" dalla waiting list ed inserimento nella ready list
+
+        SemDescriptorPtr* desc_ready= (SemDescriptorPtr*) List_detach(&(sem->waiting_descriptors) ,(ListItem*) (sem->waiting_descriptors).first );	    //drop first descriptor of waiting descriptors
+
+
+        PCB* ready=desc_ready->descriptor->pcb;  //correspoding PCB
+
+
         List_detach(&waiting_list , (ListItem*) ready);
         List_insert(&ready_list , ready_list.last , (ListItem*) ready);
-        ready->status=Ready;
+        ready->status=Ready;     //update process status
 
         //Cambiamo stato del processo chiamante che viene messo in reaDY
         running->status=Ready;

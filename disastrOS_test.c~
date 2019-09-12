@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <poll.h>
+#include "disastrOS_semaphore.h"
 #include "disastrOS.h"
+#include "disastrOS_globals.h"
+
+
+
+
+
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -32,73 +39,126 @@ void childFunction(void* args){
 }
 */
 
-void child_test(){
+void child_test(void* args){
 
-    printf("CHILD");
-    int ret = disastrOS_semOpen(16, 0);
-	for (int j=0 ; j < 5 ; j++){
+    printf("   hello , I'M CHILD ,PID: %d \n",running->pid);
 
-        	disastrOS_semWait(ret);
-         	printf("figlio in sezione critica");
-        	disastrOS_semPost(ret);
-    	}		
-    printf("figlio termina");
-    disastrOS_exit(disastrOS_getpid()+1); 
+    int app;
+    int ret = disastrOS_semOpen(16, 1);
+    if(ret < 0 ){
+          disastrOS_exit(disastrOS_getpid()+1);
+    }
+
+
+
+    printf("     **semopen child return value(fd) = %d **\n",ret);
+
+    printf("   Semaphore list : \n");
+    SemaphoreList_print(&semaphoreList);
+    int j = 0 ;
+    while(j < 5 ){
+
+        	app= disastrOS_semWait(ret);
+            if(app != 0){
+                disastrOS_exit(disastrOS_getpid()+1);
+            }
+         	printf(" [son in critical section] \n");
+        	app=disastrOS_semPost(ret);
+
+            if(app != 0){
+                disastrOS_exit(disastrOS_getpid()+1);
+            }
+            j++;
+    }
+
+    disastrOS_semClose(ret);
+    if(ret!=0){
+        disastrOS_exit(disastrOS_getpid()+1);
+    }
+
+
+    printf("  !!!son job done!!!\n");
+    disastrOS_exit(disastrOS_getpid()+1);
+}
+
+void dad_test(void* args){
+
+    printf("   HELLO I'M DAD ,PID: %d \n",running->pid);
+
+    // int nsem;
+    //printf("inserire numero  semaforo \n");
+    //scanf("%d",&nsem);
+    int ret,app;
+    int i = 0;
+
+    ret=disastrOS_semOpen(16,1);   //opening  semaphore 16
+
+    if(ret < 0 ){
+          disastrOS_exit(disastrOS_getpid()+1);
+    }
+
+    printf("  **semopen dad return value (fd) = %d ** \n " , ret);
+
+
+    printf("  Semaphore list : \n");
+    SemaphoreList_print(&semaphoreList);
+
+
+
+    while(i < 5){
+
+        app= disastrOS_semWait(ret);
+            if(app != 0){
+                disastrOS_exit(disastrOS_getpid()+1);
+            }
+
+    	printf(" [dad in critical section] \n");
+
+    	app=disastrOS_semPost(ret);
+        if(app != 0){
+                disastrOS_exit(disastrOS_getpid()+1);
+        }
+        i++;
+    }
+    disastrOS_semClose(ret);
+    if(ret!=0){
+        disastrOS_exit(disastrOS_getpid()+1);
+    }
+
+
+    printf(" !!!dad job done!!! \n");
+    disastrOS_exit(disastrOS_getpid()+1);
+
 }
 
 
 
+
 void initFunction(void* args) {
-  //disastrOS_printStatus();
-  printf("hello, I am init and I just started\n");
 
-  //testing semopen and semclose
 
-    //apriamo il semaforo 16
-    printf("/n open semaforo16 /n");
-    int nsem=16;
-    int ret,pid;
-    int retval;
+    printf("    hello, I am init and I just started\n");
+    printf("    we are testing the problem with 1 dad and  1 son , that 'access' in critical section alternativaly .\n");
+    printf("    info: we use semaphore 16 for the mutual exclusion. \n");
 
-    ret=disastrOS_semOpen(nsem,0);
-    
-    printf("open con ritorno(fd) : %d \n " , ret);
-    disastrOS_printStatus();
 
-    disastrOS_spawn(child_test, 0);
+    //"testing with 1 producer 1 consumer"
 
-    for (int i ; i < 5; i++){
-    	disastrOS_semWait(ret);
 
-    	printf("padre in sez critica");
 
-    	disastrOS_semPost(ret);
-    }
+    disastrOS_spawn(dad_test,0);
+    disastrOS_spawn(child_test,0);
+    disastrOS_wait(0,NULL);
+    disastrOS_wait(0,NULL);
 
-    //pid=disastrOS_wait(0,&retval);
-    disastrOS_semClose(ret);
-    
-    disastrOS_exit(disastrOS_getpid());
-    disastrOS_printStatus();
 
-    
-    /*printf("SSSSSSS/n");
-    //apriamo semaforo 17
-    nsem=17;
-    retval=disastrOS_semOpen(nsem,17);
-    printf(" ritorno %d " , retval );
-    disastrOS_printStatus();
+    printf("  Semaphore List  :");
+    SemaphoreList_print(&semaphoreList);
 
-    printf("chiusura di 16");
-    retval=disastrOS_semClose(ret);
-    printf("chiusura con ritorno %d" , retval);
-    disastrOS_printStatus();
-    printf("chiudiamo semaforo***")
-	ret=disastrOS_semClose(nsem);
-      printf("close con ritorno: %",ret);
+    printf("shutdown!\n");
+    disastrOS_shutdown();
 
-   disastrOS_spawn(sleeperFunction, 0);
-
+/*
 
   printf("I feel like to spawn 1 nice threads\n");
   int alive_children=0;
@@ -122,8 +182,7 @@ void initFunction(void* args) {
 	   pid, retval, alive_children);
     --alive_children;
   }*/
-  printf("shutdown!");
-  disastrOS_shutdown();
+
 }
 
 int main(int argc, char** argv){
